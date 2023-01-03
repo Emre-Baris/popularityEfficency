@@ -6,18 +6,18 @@ import java.util.Arrays;
 import java.util.List;
 public class Main {
 
-		public static ArrayList<Track> TrackList = new ArrayList<>();
+	public static ArrayList<Track> TrackList = new ArrayList<>();
 
 
-        public static void main(String[] args) throws IOException{
-                List<List<String>> list = readValues();
-               // System.out.println(list.get(0));  // Prints empty object
+	public static void main(String[] args) throws IOException{
+		List<List<String>> list = readValues();
+		// System.out.println(list.get(0));  // Prints empty object
 		List<Integer> valueList = new ArrayList<Integer>();
 		List<Integer> weightList = new ArrayList<Integer>();
 		for(int i=1;i<list.size();i++) {
-			valueList.add(Integer.parseInt(list.get(i).get(4))); 
+			valueList.add(Integer.parseInt(list.get(i).get(4)));
 			weightList.add(Integer.parseInt(list.get(i).get(5)));
-			}
+		}
 		List<List<String>> list1 = readSequential();
 		List<ArrayList<Double>> sequential_data = new ArrayList<ArrayList<Double>>();
 		for (int i=1;i<list1.size();i++){
@@ -27,19 +27,19 @@ public class Main {
 			}
 			sequential_data.add(row);
 		}
-	// 	System.out.println(sequential_data.get(0).get(1));
-		
-		
+		// 	System.out.println(sequential_data.get(0).get(1));
 
-        }
-        public static List<List<String>> readValues() throws IOException { 
-                try
+		System.out.println(getTrackCombinations(TrackList, 1800000));
+
+	}
+	public static List<List<String>> readValues() throws IOException {
+		try
 		{
 			List< List<String> > data = new ArrayList<>();//list of lists to store data
 			String file = "term_project_value_data.csv";//file path
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
-			
+
 			//Reading until we run out of lines
 			String line = br.readLine();
 			while(line != null)
@@ -61,24 +61,24 @@ public class Main {
 				TrackList.add(tr);
 			}
 			br.close();
-                        return data;
+			return data;
 		}
 		catch(Exception e)
 		{
 			System.out.print(e);
-                        List< List<String> > data = new ArrayList<>();//list of lists to store data
-                        return data;
+			List< List<String> > data = new ArrayList<>();//list of lists to store data
+			return data;
 		}
-                
-        }
+
+	}
 	public static List<List<String>> readSequential() throws IOException {
-			try
+		try
 		{
 			List< List<String> > data = new ArrayList<>();//list of lists to store data
 			String file = "term_project_sequential_data.csv";//file path
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
-			
+
 			//Reading until we run out of lines
 			String line = br.readLine();
 			while(line != null)
@@ -87,7 +87,7 @@ public class Main {
 				data.add(lineData);
 				line = br.readLine();
 			}
-			
+
 			//printing the fetched data
 			for(List<String> list : data)
 			{
@@ -96,26 +96,43 @@ public class Main {
 				//System.out.println();
 			}
 			br.close();
-                        return data;
+			return data;
 		}
-			catch(Exception e)
+		catch(Exception e)
 		{
 			System.out.print(e);
-                        List< List<String> > data = new ArrayList<>();//list of lists to store data
-                        return data;
+			List< List<String> > data = new ArrayList<>();//list of lists to store data
+			return data;
 		}
-                
-        }
 
-		public static void albumAssembler(){
-
-			TrackList
+	}
 
 
 
+	public static List<List<Integer>> getTrackCombinations(List<Track> trackList, int maxDuration) {
+		List<List<Integer>> trackCombinations = new ArrayList<>();
+		int n = trackList.size();
 
-
+		// generate all bit masks for the tracks
+		for (int i = 0; i < (1 << n); i++) {
+			List<Integer> combination = new ArrayList<>();
+			int duration = 0;
+			for (int j = 0; j < n; j++) {
+				if ((i & (1 << j)) > 0) {
+					// track j is included in this combination
+					Track track = trackList.get(j);
+					combination.add(track.getId());
+					duration += track.getDuration();
+				}
+			}
+			if (duration <= maxDuration) {
+				// combination is valid, add it to the list
+				trackCombinations.add(combination);
+			}
 		}
+
+		return trackCombinations;
+	}
 
 
 }
