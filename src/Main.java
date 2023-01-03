@@ -27,9 +27,14 @@ public class Main {
 			}
 			sequential_data.add(row);
 		}
-		// 	System.out.println(sequential_data.get(0).get(1));
 
-		System.out.println(getTrackCombinations(TrackList, 1800000));
+		Album topPop = getTrackCombinations(TrackList, 1800000);
+		System.out.println(topPop.getAlbumDuration());
+		System.out.println(topPop.getAlbumPopularity());
+
+		for (int i = 0; i <topPop.albumSongList.size() ; i++) {
+			System.out.print(topPop.albumSongList.get(i).track_id + " ");
+		}
 
 	}
 	public static List<List<String>> readValues() throws IOException {
@@ -109,30 +114,38 @@ public class Main {
 
 
 
-	public static List<List<Integer>> getTrackCombinations(List<Track> trackList, int maxDuration) {
-		List<List<Integer>> trackCombinations = new ArrayList<>();
+	public static Album getTrackCombinations(List<Track> trackList, int maxDuration) {
+
+		Album bestCombination = new Album();
 		int n = trackList.size();
+		int bestPopularity =0;
 
 		// generate all bit masks for the tracks
 		for (int i = 0; i < (1 << n); i++) {
-			List<Integer> combination = new ArrayList<>();
+			List<Track> combination = new ArrayList<>();	//Temporary list to be compared to others
 			int duration = 0;
+			int popularity = 0;
+
 			for (int j = 0; j < n; j++) {
 				if ((i & (1 << j)) > 0) {
 					// track j is included in this combination
-					Track track = trackList.get(j);
-					combination.add(track.getId());
-					duration += track.getDuration();
+					Track tr = trackList.get(j);
+					combination.add(tr);
+					duration += tr.getDuration();
+					popularity += tr.getIndividualValue();
 				}
 			}
-			if (duration <= maxDuration) {
-				// combination is valid, add it to the list
-				trackCombinations.add(combination);
+			popularity -= ((maxDuration - duration)/1000) * 0.02;  	//Reduce 0.02 points for every second
+																	//that is less than the desired duration
+
+			if (duration <= maxDuration && popularity >= bestPopularity ) {	// Check if the combination is the best one yet
+				bestPopularity = popularity;
+				bestCombination.albumDuration = duration;
+				bestCombination.albumPopularity = popularity;
+				bestCombination.albumSongList = combination;
 			}
 		}
-
-		return trackCombinations;
+		return bestCombination;
 	}
-
 
 }

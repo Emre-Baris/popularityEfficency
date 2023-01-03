@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class Track {
+public class Track extends Album{
     public int track_id;
     public int track_duration;
     public int track_individual_value;
